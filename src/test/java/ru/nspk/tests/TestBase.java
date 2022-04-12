@@ -24,7 +24,7 @@ public class TestBase {
         String version = System.getProperty("version");
 
         Configuration.browserVersion = version;
-        Configuration.baseUrl = "https://www.nspk.ru/";
+//        Configuration.baseUrl = "https://www.nspk.ru/";
         Configuration.browserSize = "1920x1080";
         Configuration.holdBrowserOpen = true;
 //        Configuration.browser = browser;
