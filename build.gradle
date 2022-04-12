@@ -3,7 +3,9 @@ plugins {
     id "io.qameta.allure" version "2.9.6"
 
 }
-
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
 repositories {
     mavenCentral()
 }
@@ -28,7 +30,7 @@ allure {
 
 
 dependencies {
-    testImplementation (
+    testImplementation(
             'com.codeborne:selenide:6.2.1',
             "io.qameta.allure:allure-selenide:$allureVersion",
             'org.junit.jupiter:junit-jupiter:5.8.2',
@@ -36,28 +38,41 @@ dependencies {
             'org.assertj:assertj-core:3.22.0',
             'com.codeborne:pdf-test:1.7.0',
             'com.codeborne:xls-test:1.4.3',
-            'com.opencsv:opencsv:5.5.2')
+            'com.opencsv:opencsv:5.5.2',
+            'org.slf4j:slf4j-nop:1.7.30',
+            'com.codeborne:pdf-test:1.7.0',
+            "io.rest-assured:rest-assured:4.4.0",
+            "org.assertj:assertj-core:3.22.0"
+    )
+
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
+
+tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 tasks.withType(Test) {
-    useJUnitPlatform()
     systemProperties(System.getProperties())
+    useJUnitPlatform()
+
+    if (System.getProperty("threads") != null) {
+        systemProperties += [
+                'junit.jupiter.execution.parallel.enabled'                 : true,
+                'junit.jupiter.execution.parallel.mode.default'            : 'concurrent',
+                'junit.jupiter.execution.parallel.mode.classes.default'    : 'concurrent',
+                'junit.jupiter.execution.parallel.config.strategy'         : 'fixed',
+                'junit.jupiter.execution.parallel.config.fixed.parallelism': System.getProperty("threads").toInteger()
+            ]
+    }
 
     testLogging {
         lifecycle {
-//            events "started", "failed"
+//           events "started", "failed"
             events "started", "skipped", "failed", "standard_error", "standard_out"
             exceptionFormat "short"
         }
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-task properties_tests(type: Test) {
-    useJUnitPlatform{
-        includeTags "properties"
     }
 }
